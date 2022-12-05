@@ -21,9 +21,6 @@ app.component('home', {
             {name:'MEath', grade:90},
         ],
         filteredCourses:[],
-        honorGradesBackup:[],
-        failGradesBackup:[]
-
       });
     },
     methods:{
@@ -77,59 +74,38 @@ app.component('home', {
                 this.grade = 0
             }
         },
-        searchCourse(){
-            this.filteredCourses = this.courses.filter((el)=>{
-                return el.name.toLowerCase().includes(this.searchKey.toLowerCase())
-            })
-            this.honorGradesBackup = [...this.filteredCourses]
-            this.failGradesBackup = [...this.filteredCourses]
-        },
         sortAsscending(){
            this.filteredCourses =  this.filteredCourses.sort((a,b)=>{
                 return b.grade-a.grade
             })
-            this.honorGradesBackup = [...this.filteredCourses]
-            this.failGradesBackup = [...this.filteredCourses]
         },
         sortDescending(){
            this.filteredCourses =  this.filteredCourses.sort((a,b)=>{
                 return a.grade-b.grade
             })
-            this.honorGradesBackup = [...this.filteredCourses]
-            this.failGradesBackup = [...this.filteredCourses]
         },
-        honorGrades(state){
-            if(state){
-                this.filteredCourses =  this.filteredCourses.filter((el)=>{
+        filterList(){
+            let temp = this.courses.filter((el)=>{
+                return el.name.toLowerCase().includes(this.searchKey)
+            })
+            if(this.honorGradesOn===true){
+                temp = temp.filter((el)=>{
                     return el.grade>=80
                 })
-            }else{
-                if(this.honorGradesBackup.length>0){
-                    this.filteredCourses =  [...this.honorGradesBackup]
-                }else{
-                    this.filteredCourses =  [...this.courses]
-                }
             }
-        },
-        failGrades(state){
-            if(state){
-                this.filteredCourses =  this.filteredCourses.filter((el)=>{
+            if(this.failGradesOn===true){
+                temp = temp.filter((el)=>{
                     return el.grade<=20
                 })
-            }else{
-                if(this.failGradesBackup.length>0){
-                    this.filteredCourses =  [...this.failGradesBackup]
-                }else{
-                    this.filteredCourses =  [...this.courses]
-                }
             }
+            this.filteredCourses = temp
         },
         reset(){
             this.filteredCourses = [...this.courses]; 
             this.searchKey=''
             this.honorGradesOn=false,
             this.failGradesOn = false
-        }
+        },
     },
     computed:{
         minimum(){
@@ -181,16 +157,16 @@ app.component('home', {
             <h1>Grade Analyzer</h1>
         </div>
         <div class="filters">
-            <input type="text" placeholder="Search course name" v-model="searchKey" @input="searchCourse"/>
+            <input type="text" placeholder="Search course name" v-model="searchKey" @input="filterList"/>
             <div class="flex">
                 <h4>Honor Grades</h4>
-                <div class="toggle" @click="honorGradesOn=!honorGradesOn; honorGrades(honorGradesOn)" :class="honorGradesOn?'toggleOn':''">
+                <div class="toggle" @click="honorGradesOn=!honorGradesOn; filterList()" :class="honorGradesOn?'toggleOn':''">
                     <div class="circle" :class="honorGradesOn?'circleOn':''"></div>
                 </div>
             </div>
             <div class="flex">
                 <h4>Fail Grades</h4>
-                <div class="toggle" @click=" failGradesOn=! failGradesOn; failGrades(failGradesOn)" :class="failGradesOn?'toggleOn':''">
+                <div class="toggle" @click=" failGradesOn=! failGradesOn; filterList()" :class="failGradesOn?'toggleOn':''">
                     <div class="circle" :class="failGradesOn?'circleOn':''"></div>
                 </div>
             </div>
